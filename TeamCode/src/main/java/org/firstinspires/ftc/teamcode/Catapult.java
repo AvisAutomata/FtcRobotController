@@ -8,7 +8,6 @@ public class Catapult {
     private Gamepad gamepad;
 
     private int targetPosition;
-    private boolean direction=true;
 
     public Catapult(DcMotor motor, Gamepad gamepad) {
         this.motor = motor;
@@ -16,40 +15,27 @@ public class Catapult {
     }
 
     public void Shoot() {
-        targetPosition = GetPosition()+100;
-        motor.setPower(0.5);
-        direction=true;
-    }
-    public void Return(){
-        direction=false;
-        targetPosition= GetPosition()-100;
-        motor.setPower(-0.5);
+        targetPosition =(int) (GetPosition()+537.6);
+        motor.setTargetPosition(targetPosition);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setPower(.5);
+
 
     }
+
+
+
+
 
     public int GetPosition() {
         return motor.getCurrentPosition();
     }
 
     public void Loop() {
-        boolean xButton = gamepad.x;
+        boolean xButton = gamepad.xWasPressed();
         if (xButton) {
             this.Shoot();
         }
-
-        if (direction){
-            if (motor.getCurrentPosition() > targetPosition) {
-                Return();
-
-            }
-        } else {
-            if (motor.getCurrentPosition()< targetPosition){
-                motor.setPower(0);
-
-            }
-        }
-
-
     }
 
 
