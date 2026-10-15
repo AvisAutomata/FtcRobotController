@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCompatibilityManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -68,7 +70,6 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Concept: AprilTag", group = "Concept")
-@Disabled
 public class ConceptAprilTag extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
@@ -77,6 +78,8 @@ public class ConceptAprilTag extends LinearOpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
+
+    private Servo servo;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -100,6 +103,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        servo=hardwareMap.get(Servo.class,"servo");
 
         // Demonstrate how to add a camera compatibility quirk
         // these can sometimes be needed if a camera behaves poorly.
@@ -121,6 +125,21 @@ public class ConceptAprilTag extends LinearOpMode {
         while (opModeIsActive()) {
 
             telemetryAprilTag();
+
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+            if (!currentDetections.isEmpty()){
+                AprilTagDetection detection=currentDetections.get(0);
+              if (detection instanceof AprilTagClusterDetection){
+                double bearing=detection.ftcPose.bearing;
+                  double position=bearing/280+.5;
+                   servo.setPosition(position);
+              }
+
+            }else {
+                servo.setPosition(.5);
+
+            }
 
             // Push telemetry to the Driver Station.
             telemetry.update();
